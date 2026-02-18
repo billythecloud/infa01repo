@@ -1,9 +1,12 @@
-name: Build and Push Docker Image
+name: Build and Deploy
 
 on:
   push:
     branches:
       - main
+
+env:
+  IMAGE_NAME: 213769420696969/lab-infra01
 
 jobs:
   build:
@@ -19,10 +22,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: |
-            213769420696969/lab-infra01:latest
-             213769420696969/lab-infra01:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: self-hosted   # to jest Twój runner w WSL
+
+    steps:
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/nginx-lab nginx=${{ env.IMAGE_NAME }}:${{ github.sha }}
+          kubectl rollout status deployment/nginx
