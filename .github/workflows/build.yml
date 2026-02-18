@@ -38,4 +38,4 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/nginx-lab nginx=${{ env.IMAGE_NAME }}:${{ github.sha }} -n stage4
-          kubectl rollout status deployment/nginx
+          kubectl rollout status deployment/nginx-lab -n stage4
