@@ -1,0 +1,3 @@
+window.APP_ENV = {
+  POD_NAME: "${POD_NAME}"
+};

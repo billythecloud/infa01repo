@@ -108,6 +108,42 @@
             color: #666;
             font-size: 0.9em;
         }
+        .details-panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 30px;
+        }
+        .details-panel h3 {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .details-item {
+            background: #f4f6fb;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .details-item .label {
+            display: block;
+            font-size: 0.75em;
+            color: #8a96b0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .details-item .value {
+            font-size: 0.95em;
+            color: #111;
+            word-break: break-word;
+        }
         @media (max-width: 600px) {
             .info-grid {
                 grid-template-columns: 1fr;
@@ -151,6 +187,47 @@
                     <p id="uptime">--:--:--</p>
                 </div>
             </div>
+            <div class="details-panel">
+                <h3>Session &amp; Protocol Snapshot</h3>
+                <div class="details-grid">
+                    <div class="details-item">
+                        <span class="label">Session ID</span>
+                        <span class="value" id="session-id">loading...</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">App Protocol</span>
+                        <span class="value" id="session-protocol">HTTP</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">Port</span>
+                        <span class="value" id="session-port">80</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">Host / Pod</span>
+                        <span class="value" id="session-host">localhost</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">Route &amp; Query</span>
+                        <span class="value" id="session-path">/</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">Referrer</span>
+                        <span class="value" id="session-referrer">direct</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">Client Locale</span>
+                        <span class="value" id="session-locale">en-US</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">Connection Profile</span>
+                        <span class="value" id="session-connection">unknown</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="label">Session Start</span>
+                        <span class="value" id="session-start">--</span>
+                    </div>
+                </div>
+            </div>
             <div class="divider"></div>
             <div style="text-align: center; color: #666;">
                 <p style="margin-bottom: 10px;">✅ All services running correctly</p>
@@ -158,15 +235,83 @@
             </div>
         </div>
         <div class="footer">
-            <p>© 2024 Lab Infrastructure | CI/CD Pipeline v2 | Kubernetes Ready</p>
+            <p>© 2026 Lab Infrastructure | CI/CD Pipeline v2 | Kubernetes Ready | @billythecloud</p>
         </div>
     </div>
 
+    <script src="/app-env.js"></script>
     <script>
-        // Get POD information from hostname
-        document.getElementById('pod-name').textContent = window.location.hostname || 'nginx-deployment';
-        
-        // Get client IP address
+        const podEl = document.getElementById('pod-name');
+        const protocolEl = document.getElementById('session-protocol');
+        const portEl = document.getElementById('session-port');
+        const hostEl = document.getElementById('session-host');
+        const pathEl = document.getElementById('session-path');
+        const referrerEl = document.getElementById('session-referrer');
+        const localeEl = document.getElementById('session-locale');
+        const connectionEl = document.getElementById('session-connection');
+        const sessionIdEl = document.getElementById('session-id');
+        const sessionStartEl = document.getElementById('session-start');
+
+        function getSessionId() {
+            const storageKey = 'app-session-id';
+            const stored = sessionStorage.getItem(storageKey);
+            if (stored) {
+                return stored;
+            }
+            const randomId = typeof crypto !== 'undefined' && crypto.randomUUID
+                ? crypto.randomUUID()
+                : `sess-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+            sessionStorage.setItem(storageKey, randomId);
+            return randomId;
+        }
+
+        const sessionStart = new Date();
+        const locationData = window.location || {};
+        const hostName = locationData.hostname || 'localhost';
+        const k8sPodName = window.APP_ENV && window.APP_ENV.POD_NAME ? window.APP_ENV.POD_NAME : '';
+        const portValue = locationData.port || (locationData.protocol === 'https:' ? '443' : '80');
+        const protocolValue = (locationData.protocol || 'http:').replace(':', '');
+        const route = `${locationData.pathname || '/'}${locationData.search || ''}`;
+
+        podEl.textContent = k8sPodName || hostName;
+        protocolEl.textContent = protocolValue.toUpperCase();
+        portEl.textContent = portValue;
+        hostEl.textContent = locationData.host || hostName;
+        pathEl.textContent = route;
+        referrerEl.textContent = document.referrer || 'direct';
+        localeEl.textContent = navigator.language || 'und';
+        sessionIdEl.textContent = getSessionId();
+        sessionStartEl.textContent = sessionStart.toLocaleString('en-US', {
+            hour12: false,
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (connection) {
+            const parts = [
+                connection.effectiveType && connection.effectiveType.toUpperCase(),
+                connection.type,
+                typeof connection.downlink === 'number' && `${connection.downlink.toFixed(1)} Mb/s`,
+                typeof connection.rtt === 'number' && `${connection.rtt.toFixed(0)} ms`,
+                connection.saveData ? 'Save-Data' : null,
+            ].filter(Boolean);
+            connectionEl.textContent = parts.join(' · ') || 'unknown';
+        } else {
+            connectionEl.textContent = 'unknown';
+        }
+
+        function updateUptime() {
+            const now = new Date();
+            document.getElementById('uptime').textContent = now.toLocaleTimeString('en-US');
+        }
+
+        updateUptime();
+        setInterval(updateUptime, 1000);
+
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
@@ -175,14 +320,6 @@
             .catch(() => {
                 document.getElementById('ip-address').textContent = 'localhost';
             });
-
-        // Update current time
-        function updateUptime() {
-            const now = new Date();
-            document.getElementById('uptime').textContent = now.toLocaleTimeString('en-US');
-        }
-        updateUptime();
-        setInterval(updateUptime, 1000);
     </script>
 </body>
 </html>
