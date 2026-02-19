@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikacja - Panel Startowy</title>
+    <title>Application - Startup Panel</title>
     <style>
         * {
             margin: 0;
@@ -121,40 +121,40 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Aplikacja</h1>
-            <p>Panel Startowy - Kubernetes Deployment</p>
+            <h1>🚀 Application</h1>
+            <p>Startup Panel - Kubernetes Deployment</p>
         </div>
         <div class="content">
             <div class="info-grid">
                 <div class="info-card">
-                    <h3>📦 Nazwa PODa</h3>
+                    <h3>📦 Pod Name</h3>
                     <p id="pod-name">nginx-deployment-xxxxx</p>
                     <div class="status">
                         <div class="status-dot"></div>
-                        <span class="status-text">Uruchomiony</span>
+                        <span class="status-text">Running</span>
                     </div>
                 </div>
                 <div class="info-card">
-                    <h3>🌐 Serwer Web</h3>
+                    <h3>🌐 Web Server</h3>
                     <p>nginx</p>
                     <div class="status">
                         <div class="status-dot"></div>
-                        <span class="status-text">Aktywny</span>
+                        <span class="status-text">Active</span>
                     </div>
                 </div>
                 <div class="info-card">
-                    <h3>🔗 Adres IP</h3>
+                    <h3>🔗 IP Address</h3>
                     <p id="ip-address">127.0.0.1</p>
                 </div>
                 <div class="info-card">
-                    <h3>🕐 Czas Uruchomienia</h3>
+                    <h3>🕐 Current Time</h3>
                     <p id="uptime">--:--:--</p>
                 </div>
             </div>
             <div class="divider"></div>
             <div style="text-align: center; color: #666;">
-                <p style="margin-bottom: 10px;">✅ Wszystkie usługi działają prawidłowo</p>
-                <p style="font-size: 0.9em; color: #999;">Aplikacja nginx jest w pełni operacyjna i gotowa do obsługi żądań</p>
+                <p style="margin-bottom: 10px;">✅ All services running correctly</p>
+                <p style="font-size: 0.9em; color: #999;">The nginx application is fully operational and ready to handle requests</p>
             </div>
         </div>
         <div class="footer">
@@ -163,10 +163,10 @@
     </div>
 
     <script>
-        // Pobierz informacje o PODzie z hostname
+        // Get POD information from hostname
         document.getElementById('pod-name').textContent = window.location.hostname || 'nginx-deployment';
         
-        // Pobierz adres IP klienta
+        // Get client IP address
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
@@ -176,10 +176,10 @@
                 document.getElementById('ip-address').textContent = 'localhost';
             });
 
-        // Symuluj czas uptime
+        // Update current time
         function updateUptime() {
             const now = new Date();
-            document.getElementById('uptime').textContent = now.toLocaleTimeString('pl-PL');
+            document.getElementById('uptime').textContent = now.toLocaleTimeString('en-US');
         }
         updateUptime();
         setInterval(updateUptime, 1000);
