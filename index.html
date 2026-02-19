@@ -268,7 +268,7 @@
         const sessionStart = new Date();
         const locationData = window.location || {};
         const hostName = locationData.hostname || 'localhost';
-        const k8sPodName = window.APP_ENV && window.APP_ENV.POD_NAME ? window.APP_ENV.POD_NAME : '';
+        const k8sPodName = window.APP_ENV && window.APP_ENV.HOSTNAME ? window.APP_ENV.HOSTNAME : '';
         const portValue = locationData.port || (locationData.protocol === 'https:' ? '443' : '80');
         const protocolValue = (locationData.protocol || 'http:').replace(':', '');
         const route = `${locationData.pathname || '/'}${locationData.search || ''}`;
